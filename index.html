@@ -1,19 +1,3 @@
-<!--
-SITO MATRIMONIO – Donatella & Salvatore
-Single-file (mobile-first) con animazioni + sezioni: Invito, Programma, Mappe, RSVP, Regalo.
-
-✅ Come usare:
-1) Sostituisci i placeholder:
-   - CHIESA_ADDRESS / C.so Vittorio Emanuele, 328, 80135 Napoli NA
-   - CHIESA_MAP_EMBED / RICEVIMENTO_MAP_EMBED (iframe Google Maps)
-   - DATA, ORARI, IBAN
-2) (Opzionale) collega il form:
-   - Formspree: crea endpoint e mettilo in action="https://formspree.io/f/xxxx"
-   - Oppure Netlify forms: aggiungi netlify e pubblica su Netlify.
-
-⚠️ Nota Mappe:
-Qui uso iframe "Embed" (più semplice, zero API key). Se vuoi Google Maps JS API interattiva, dimmelo.
--->
 <!doctype html>
 <html lang="it">
 <head>
@@ -28,460 +12,80 @@ Qui uso iframe "Embed" (più semplice, zero API key). Se vuoi Google Maps JS API
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
 
-  <style>
-    :root{
-      --bg: #fbf9f6;
-      --paper: rgba(255,255,255,.78);
-      --ink: #2e2a28;
-      --muted: rgba(46,42,40,.72);
-      --gold: #b8924a;
-      --gold2:#d6b56a;
-      --sage:#7e9a86;
-      --leaf:#a8c0b0;
-      --rose:#e59aa4;
-      --shadow: 0 18px 45px rgba(20,16,12,.12);
-      --shadow2: 0 10px 25px rgba(20,16,12,.10);
-      --r: 22px;
-      --r2: 28px;
-      --max: 1040px;
-    }
-
-    *{box-sizing:border-box}
-    html,body{height:100%}
-    body{
-      margin:0;
-      font-family: Montserrat, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      color:var(--ink);
-      background: radial-gradient(900px 420px at 50% -10%, rgba(214,181,106,.25), transparent 70%),
-                  radial-gradient(700px 360px at 10% 15%, rgba(168,192,176,.25), transparent 70%),
-                  radial-gradient(700px 360px at 90% 40%, rgba(229,154,164,.18), transparent 70%),
-                  var(--bg);
-      overflow-x:hidden;
-    }
-
-    a{color:inherit}
-
-    /* Subtle watercolor texture overlay */
-    .texture{
-      position:fixed; inset:0;
-      pointer-events:none;
-      background:
-        radial-gradient(600px 280px at 20% 30%, rgba(214,181,106,.10), transparent 60%),
-        radial-gradient(650px 300px at 80% 70%, rgba(126,154,134,.10), transparent 60%),
-        radial-gradient(420px 220px at 55% 55%, rgba(229,154,164,.08), transparent 60%);
-      mix-blend-mode:multiply;
-      opacity:.55;
-      filter: blur(.2px);
-      z-index:0;
-    }
-
-    /* Floating watercolor splashes */
-    .splash{
-      position:absolute;
-      width:220px; height:220px;
-      border-radius: 50% 55% 45% 60% / 60% 45% 55% 40%;
-      background: radial-gradient(circle at 30% 30%, rgba(214,181,106,.28), rgba(214,181,106,.04) 60%, transparent 70%);
-      filter: blur(.2px);
-      opacity:.8;
-      animation: drift 14s ease-in-out infinite;
-    }
-    .splash.s2{ width:260px; height:260px; opacity:.55; background: radial-gradient(circle at 35% 35%, rgba(126,154,134,.22), rgba(126,154,134,.04) 60%, transparent 70%); animation-duration: 18s; }
-    .splash.s3{ width:180px; height:180px; opacity:.55; background: radial-gradient(circle at 35% 35%, rgba(229,154,164,.22), rgba(229,154,164,.04) 60%, transparent 70%); animation-duration: 16s; }
-    @keyframes drift{
-      0%{ transform: translate3d(0,0,0) rotate(0deg) }
-      50%{ transform: translate3d(18px,-12px,0) rotate(3deg) }
-      100%{ transform: translate3d(0,0,0) rotate(0deg) }
-    }
-
-    .wrap{ position:relative; z-index:1; }
-
-    /* Header / Nav */
-    header{
-      position:sticky; top:0; z-index:50;
-      backdrop-filter: blur(10px);
-      background: linear-gradient(to bottom, rgba(251,249,246,.92), rgba(251,249,246,.78));
-      border-bottom: 1px solid rgba(184,146,74,.18);
-    }
-    .nav{
-      max-width: var(--max);
-      margin:0 auto;
-      padding: 10px 16px;
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:14px;
-    }
-    .brand{
-      display:flex; flex-direction:column;
-      line-height:1.1;
-    }
-    .brand b{
-      font-family: "Playfair Display", serif;
-      font-weight: 700;
-      letter-spacing:.2px;
-      font-size: 16px;
-    }
-    .brand span{ font-size: 12px; color: var(--muted) }
-
-    .menu{
-      display:flex; gap:10px;
-      align-items:center;
-    }
-    .menu a{
-      text-decoration:none;
-      font-size: 13px;
-      padding: 8px 10px;
-      border-radius: 999px;
-      transition: transform .2s ease, background .2s ease;
-    }
-    .menu a:hover{ background: rgba(184,146,74,.10); transform: translateY(-1px) }
-
-    .cta{
-      appearance:none;
-      border:0;
-      cursor:pointer;
-      padding: 10px 14px;
-      border-radius: 999px;
-      background: linear-gradient(135deg, var(--gold), var(--gold2));
-      color: #fff;
-      font-weight: 600;
-      box-shadow: 0 12px 26px rgba(184,146,74,.24);
-      transition: transform .18s ease, filter .18s ease;
-      white-space:nowrap;
-    }
-    .cta:hover{ transform: translateY(-1px); filter: brightness(1.03) }
-    .cta:active{ transform: translateY(0px) scale(.99) }
-
-    /* Mobile menu */
-    .burger{
-      display:none;
-      border:1px solid rgba(184,146,74,.28);
-      background: rgba(255,255,255,.55);
-      border-radius: 14px;
-      padding: 10px;
-      box-shadow: var(--shadow2);
-    }
-    .burger svg{ display:block }
-
-    @media (max-width: 780px){
-      .menu{ display:none }
-      .burger{ display:inline-flex }
-      .brand b{ font-size: 15px }
-    }
-
-    /* Sections */
-    section{
-      padding: 56px 16px;
-    }
-    .container{
-      max-width: var(--max);
-      margin: 0 auto;
-    }
-    .grid{
-      display:grid;
-      grid-template-columns: 1.2fr .8fr;
-      gap: 22px;
-      align-items: stretch;
-    }
-    @media (max-width: 920px){
-      .grid{ grid-template-columns: 1fr; }
-    }
-
-    /* Landing invite */
-    .hero{
-      min-height: calc(100svh - 56px);
-      display:flex;
-      align-items:center;
-      position:relative;
-      overflow:hidden;
-    }
-
-    .letter{
-      background: var(--paper);
-      border: 1px solid rgba(184,146,74,.18);
-      border-radius: var(--r2);
-      box-shadow: var(--shadow);
-      padding: 22px 18px;
-      position:relative;
-      overflow:hidden;
-      transform: translateY(8px);
-    }
-    .letter:before{
-      content:"";
-      position:absolute; inset:-2px;
-      border-radius: inherit;
-      background:
-        radial-gradient(700px 240px at 20% -10%, rgba(214,181,106,.20), transparent 60%),
-        radial-gradient(700px 260px at 100% 10%, rgba(168,192,176,.16), transparent 58%),
-        radial-gradient(700px 240px at 50% 120%, rgba(229,154,164,.12), transparent 55%);
-      z-index:0;
-      opacity:.9;
-    }
-    .letter > *{ position:relative; z-index:1 }
-
-    .kicker{
-      display:flex; align-items:center; gap:10px;
-      color: var(--muted);
-      font-size: 12px;
-      letter-spacing: .12em;
-      text-transform: uppercase;
-    }
-    .kicker .dot{ width:6px; height:6px; border-radius:50%; background: var(--gold) }
-
-    h1{
-      margin: 10px 0 8px;
-      font-family: "Playfair Display", serif;
-      font-size: clamp(34px, 5vw, 54px);
-      letter-spacing: .2px;
-    }
-
-    .subtitle{
-      color: var(--muted);
-      font-size: 14.5px;
-      line-height: 1.6;
-      margin: 0 0 14px;
-      max-width: 56ch;
-    }
-
-    .invite-text{
-      font-size: 15px;
-      line-height: 1.7;
-      color: rgba(46,42,40,.86);
-      margin-top: 10px;
-    }
-
-    .hero-actions{
-      display:flex; gap:10px; flex-wrap:wrap;
-      margin-top: 18px;
-    }
-
-    .ghost{
-      appearance:none;
-      border: 1px solid rgba(184,146,74,.35);
-      background: rgba(255,255,255,.52);
-      color: var(--ink);
-      padding: 10px 14px;
-      border-radius: 999px;
-      cursor:pointer;
-      font-weight: 600;
-      transition: transform .18s ease, background .18s ease;
-    }
-    .ghost:hover{ transform: translateY(-1px); background: rgba(184,146,74,.08) }
-
-    .card{
-      background: rgba(255,255,255,.68);
-      border: 1px solid rgba(184,146,74,.14);
-      border-radius: var(--r);
-      box-shadow: var(--shadow2);
-      padding: 18px;
-      overflow:hidden;
-      position:relative;
-    }
-
-    .card h3{
-      font-family: "Playfair Display", serif;
-      margin: 2px 0 10px;
-      font-size: 22px;
-    }
-
-    .badge{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      background: rgba(184,146,74,.10);
-      color: rgba(46,42,40,.86);
-      border: 1px solid rgba(184,146,74,.18);
-      padding: 8px 12px;
-      border-radius: 999px;
-      font-size: 13px;
-    }
-
-    .divider{
-      height:1px;
-      background: linear-gradient(to right, transparent, rgba(184,146,74,.45), transparent);
-      margin: 16px 0;
-    }
-
-    /* Timeline */
-    .timeline{ display:grid; gap:12px }
-    .step{
-      display:flex; gap:12px;
-      align-items:flex-start;
-      padding: 12px;
-      border-radius: 18px;
-      background: rgba(255,255,255,.55);
-      border: 1px dashed rgba(184,146,74,.25);
-    }
-    .step .time{
-      font-weight:700;
-      color: var(--gold);
-      min-width: 64px;
-    }
-    .step .what{ color: rgba(46,42,40,.86); line-height: 1.5; }
-
-    /* Map embeds */
-    .maps{ display:grid; grid-template-columns: 1fr 1fr; gap: 16px }
-    @media (max-width: 920px){ .maps{ grid-template-columns: 1fr; } }
-
-    .mapbox iframe{
-      width:100%;
-      height: 320px;
-      border:0;
-      border-radius: 18px;
-      box-shadow: var(--shadow2);
-    }
-
-    /* Form */
-    form{ display:grid; gap: 12px }
-    .row{ display:grid; grid-template-columns: 1fr 1fr; gap: 12px }
-    @media (max-width: 640px){ .row{ grid-template-columns: 1fr } }
-
-    label{ font-size: 12.5px; color: var(--muted); display:block; margin-bottom: 6px }
-    input, select, textarea{
-      width:100%;
-      padding: 12px 12px;
-      border-radius: 16px;
-      border: 1px solid rgba(184,146,74,.22);
-      background: rgba(255,255,255,.76);
-      outline: none;
-      font: inherit;
-      box-shadow: 0 10px 24px rgba(20,16,12,.05);
-      transition: transform .15s ease, border-color .15s ease;
-    }
-    textarea{ min-height: 110px; resize: vertical }
-    input:focus, select:focus, textarea:focus{ border-color: rgba(184,146,74,.55); transform: translateY(-1px) }
-
-    .plusList{ display:grid; gap:10px }
-    .pill{
-      display:flex; align-items:center; justify-content:space-between;
-      gap:10px;
-      padding: 10px 12px;
-      border-radius: 16px;
-      border: 1px solid rgba(184,146,74,.20);
-      background: rgba(255,255,255,.55);
-    }
-    .pill small{ color: var(--muted) }
-    .pill button{
-      border:0;
-      background: rgba(229,154,164,.14);
-      color: rgba(46,42,40,.9);
-      border: 1px solid rgba(229,154,164,.20);
-      padding: 8px 10px;
-      border-radius: 999px;
-      cursor:pointer;
-      transition: transform .15s ease;
-    }
-    .pill button:hover{ transform: translateY(-1px) }
-
-    .form-actions{ display:flex; gap:10px; flex-wrap:wrap; align-items:center }
-    .hint{ color: var(--muted); font-size: 12.5px; line-height: 1.4 }
-
-    /* Footer */
-    footer{ padding: 36px 16px 56px; color: var(--muted) }
-    footer .container{ display:flex; align-items:center; justify-content:space-between; gap:12px; flex-wrap:wrap }
-
-    /* Animation helpers */
-    .reveal{ opacity:0; transform: translateY(18px) scale(.98); transition: opacity .8s ease, transform .8s cubic-bezier(.2,.9,.2,1) }
-    .reveal.in{ opacity:1; transform: translateY(0) scale(1) }
-
-    .fadeout{ opacity:0 !important; transform: translateY(-8px) scale(.98) !important; pointer-events:none !important; transition: opacity .6s ease, transform .6s ease }
-
-    /* Modal Mobile menu */
-    .sheet{
-      position: fixed; inset:0;
-      background: rgba(20,16,12,.35);
-      backdrop-filter: blur(6px);
-      display:none;
-      z-index: 80;
-    }
-    .sheet.open{ display:block }
-    .sheet .panel{
-      position:absolute; left:12px; right:12px; top:12px;
-      background: rgba(255,255,255,.80);
-      border:1px solid rgba(184,146,74,.18);
-      border-radius: 22px;
-      box-shadow: var(--shadow);
-      padding: 12px;
-      animation: pop .22s ease;
-    }
-    @keyframes pop{ from{ transform: translateY(-8px); opacity:.6 } to{ transform: translateY(0); opacity:1 } }
-    .sheet a{ display:block; padding: 12px; border-radius: 16px; text-decoration:none; font-weight:600 }
-    .sheet a:hover{ background: rgba(184,146,74,.10) }
-    .sheet .x{ display:flex; justify-content:flex-end }
-    .sheet .x button{
-      border:1px solid rgba(184,146,74,.28);
-      background: rgba(255,255,255,.55);
-      border-radius: 14px;
-      padding: 10px;
-      cursor:pointer;
-    }
-
-    /* Reduced motion */
-    @media (prefers-reduced-motion: reduce){
-      *{ animation:none !important; transition:none !important; scroll-behavior:auto !important; }
-    }
-
-    /* Smooth scroll */
-    html{ scroll-behavior:smooth }
-
-    /* Small details */
-    .ringline{
-      display:flex; align-items:center; gap:10px;
-      margin-top: 10px;
-      color: var(--muted);
-      font-size: 12.5px;
-    }
-    .ringline svg{ opacity:.9 }
-
-    .copy{
-      display:flex; gap:10px; flex-wrap:wrap; align-items:center;
-      padding: 12px;
-      border-radius: 18px;
-      background: rgba(255,255,255,.58);
-      border:1px solid rgba(184,146,74,.18);
-    }
-    .copy code{
-      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-      font-size: 12.5px;
-      background: rgba(184,146,74,.10);
-      padding: 6px 10px;
-      border-radius: 999px;
-      border:1px solid rgba(184,146,74,.16);
-    }
-    .copy button{
-      border:0;
-      background: rgba(184,146,74,.14);
-      border:1px solid rgba(184,146,74,.20);
-      padding: 10px 12px;
-      border-radius: 999px;
-      cursor:pointer;
-      font-weight:700;
-    }
-
-    /* Ornamental corner leaves (SVG) */
-    .orn{
-      position:absolute;
-      right:-18px;
-      top:-18px;
-      width: 180px;
-      opacity:.30;
-      transform: rotate(10deg);
-    }
-    .orn2{
-      position:absolute;
-      left:-22px;
-      bottom:-24px;
-      width: 210px;
-      opacity:.28;
-      transform: rotate(-8deg);
-    }
-  </style>
+  <link rel="stylesheet" href="./styles.css" />
 </head>
 
 <body>
   <div class="texture"></div>
-  <div class="wrap">
 
+  <!-- =========================
+       LANDING INVITATION (prima pagina)
+       ========================= -->
+  <div class="landing" id="landing" aria-label="Landing invito">
+    <div class="landing-bg">
+      <div class="splash" style="left:-40px; top: 40px"></div>
+      <div class="splash s2" style="right:-70px; top: 90px"></div>
+      <div class="splash s3" style="left: 42%; bottom: -70px"></div>
+    </div>
+
+    <div class="landing-inner">
+      <div class="landing-title">
+        <div class="kicker"><span class="dot"></span> Invito</div>
+        <h1 class="landing-h1">Donatella &amp; Salvatore</h1>
+        <p class="landing-sub">
+          Clicca sul sigillo in cera per aprire la busta e scoprire l’invito.
+        </p>
+      </div>
+
+      <!-- Envelope -->
+      <div class="envelope-stage" aria-label="Busta con sigillo">
+        <div class="envelope" id="envelope" role="button" tabindex="0" aria-label="Apri invito">
+          <!-- card that slides out -->
+          <div class="letter-card" id="landingCard" aria-hidden="true">
+            <div class="letter-card-inner">
+              <div class="brand-mini">
+                <b>Donatella &amp; Salvatore</b>
+                <span>Ci sposiamo — <span id="weddingDateMini2">DATA</span></span>
+              </div>
+              <div class="divider"></div>
+              <p class="landing-card-text">
+                <b>Data:</b> <span id="weddingDate2">DATA</span><br/>
+                <b>Cerimonia:</b> <span id="churchTime2">ORE</span> — <span id="churchName3">CHIESA</span><br/>
+                <b>Ricevimento:</b> <span id="venueTime2">ORE</span> — <span id="venueName2">RICEVIMENTO</span>
+              </p>
+              <p class="hint" style="margin:0">— scorri per i dettagli —</p>
+            </div>
+          </div>
+
+          <!-- envelope body -->
+          <div class="env-body">
+            <div class="env-paper"></div>
+            <div class="env-front"></div>
+            <div class="env-flap" id="flap"></div>
+
+            <!-- Wax seal -->
+            <button class="wax" id="wax" type="button" aria-label="Sigillo in cera (clicca per aprire)">
+              <span class="wax-shine" aria-hidden="true"></span>
+              <span class="wax-monogram" aria-hidden="true">D&nbsp;S</span>
+            </button>
+
+            <!-- crack lines -->
+            <div class="wax-crack" id="waxCrack" aria-hidden="true"></div>
+          </div>
+        </div>
+
+        <div class="landing-cta-row">
+          <button class="ghost" id="skipLanding" type="button">Salta animazione</button>
+          <span class="hint" id="landingMsg" aria-live="polite"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================
+       SITO (inizialmente nascosto)
+       ========================= -->
+  <div class="wrap" id="site" aria-hidden="true">
     <header aria-label="Navigazione">
       <nav class="nav">
         <div class="brand" aria-label="Brand">
@@ -518,8 +122,8 @@ Qui uso iframe "Embed" (più semplice, zero API key). Se vuoi Google Maps JS API
       </div>
     </div>
 
-    <!-- HERO / INVITO -->
     <main>
+      <!-- HERO / INVITO -->
       <section class="hero" id="home" aria-label="Invito">
         <div class="splash" style="left:-40px; top: 20px"></div>
         <div class="splash s2" style="right:-70px; top: 80px"></div>
@@ -539,7 +143,7 @@ Qui uso iframe "Embed" (più semplice, zero API key). Se vuoi Google Maps JS API
             <div class="divider"></div>
 
             <p class="invite-text">
-              <span style="font-family: 'Playfair Display', serif; font-size: 20px;">Carissimi,</span><br/>
+              <span class="dear">Carissimi,</span><br/>
               con immensa gioia vi aspettiamo per celebrare insieme questo giorno speciale.
               <br/><br/>
               <b>Data:</b> <span id="weddingDate">DATA</span><br/>
@@ -596,8 +200,8 @@ Qui uso iframe "Embed" (più semplice, zero API key). Se vuoi Google Maps JS API
           <div class="grid">
             <div class="card reveal">
               <div class="kicker"><span class="dot"></span> Programma</div>
-              <h2 style="font-family:'Playfair Display',serif; margin:10px 0 6px; font-size: 34px;">La giornata</h2>
-              <p style="color:var(--muted); line-height:1.7; margin-top:0">
+              <h2 class="h2">La giornata</h2>
+              <p class="p-muted">
                 Orari indicativi. Vi consigliamo di arrivare con qualche minuto di anticipo.
               </p>
 
@@ -634,7 +238,7 @@ Qui uso iframe "Embed" (più semplice, zero API key). Se vuoi Google Maps JS API
             <div class="card reveal">
               <div class="kicker"><span class="dot"></span> Un pensiero</div>
               <h3>Grazie di cuore</h3>
-              <p style="color:rgba(46,42,40,.86); line-height:1.7">
+              <p class="p-normal">
                 La vostra presenza è il regalo più bello. Questo sito raccoglie le informazioni utili per vivere la giornata con serenità.
               </p>
               <div class="divider"></div>
@@ -651,8 +255,8 @@ Qui uso iframe "Embed" (più semplice, zero API key). Se vuoi Google Maps JS API
         <div class="container">
           <div class="card reveal">
             <div class="kicker"><span class="dot"></span> Luoghi</div>
-            <h2 style="font-family:'Playfair Display',serif; margin:10px 0 6px; font-size: 34px;">Come arrivare</h2>
-            <p style="color:var(--muted); line-height:1.7; margin-top:0">
+            <h2 class="h2">Come arrivare</h2>
+            <p class="p-muted">
               Qui trovi le mappe per la chiesa e per il ricevimento.
             </p>
 
@@ -661,7 +265,6 @@ Qui uso iframe "Embed" (più semplice, zero API key). Se vuoi Google Maps JS API
             <div class="maps">
               <div class="mapbox">
                 <div class="badge" style="margin-bottom: 10px">⛪ <b style="margin-left:6px">Chiesa</b></div>
-                <!-- Sostituisci con iframe embed di Google Maps -->
                 <iframe
                   title="Mappa Chiesa"
                   loading="lazy"
@@ -673,7 +276,6 @@ Qui uso iframe "Embed" (più semplice, zero API key). Se vuoi Google Maps JS API
 
               <div class="mapbox">
                 <div class="badge" style="margin-bottom: 10px">🥂 <b style="margin-left:6px">Ricevimento</b></div>
-                <!-- Sostituisci con iframe embed di Google Maps -->
                 <iframe
                   title="Mappa Ricevimento"
                   loading="lazy"
@@ -693,18 +295,13 @@ Qui uso iframe "Embed" (più semplice, zero API key). Se vuoi Google Maps JS API
           <div class="grid">
             <div class="card reveal">
               <div class="kicker"><span class="dot"></span> RSVP</div>
-              <h2 style="font-family:'Playfair Display',serif; margin:10px 0 6px; font-size: 34px;">Conferma la tua presenza</h2>
-              <p style="color:var(--muted); line-height:1.7; margin-top:0">
+              <h2 class="h2">Conferma la tua presenza</h2>
+              <p class="p-muted">
                 Compila i campi qui sotto. Puoi indicare anche i nomi di eventuali +1 e intolleranze.
               </p>
 
               <div class="divider"></div>
 
-              <!--
-                Collega qui un endpoint reale:
-                - Formspree: action="https://formspree.io/f/xxxx"
-                - Netlify: aggiungi netlify e name="rsvp" sul form
-              -->
               <form id="rsvpForm" action="#" method="POST" novalidate>
 
                 <div class="row">
@@ -771,16 +368,14 @@ Qui uso iframe "Embed" (più semplice, zero API key). Se vuoi Google Maps JS API
                   <span class="hint" id="formMsg" aria-live="polite"></span>
                 </div>
 
-                <!-- Campo hidden con elenco partecipanti (popolato via JS) -->
                 <input type="hidden" id="partecipanti" name="partecipanti" value="" />
-
               </form>
             </div>
 
             <div class="card reveal">
               <div class="kicker"><span class="dot"></span> Contatti</div>
               <h3>Hai dubbi?</h3>
-              <p style="color:rgba(46,42,40,.86); line-height:1.7">
+              <p class="p-normal">
                 Scrivici per qualsiasi informazione logistica (parcheggio, orari, bambini, ecc.).
               </p>
               <div class="divider"></div>
@@ -809,8 +404,8 @@ Qui uso iframe "Embed" (più semplice, zero API key). Se vuoi Google Maps JS API
         <div class="container">
           <div class="card reveal">
             <div class="kicker"><span class="dot"></span> Regalo</div>
-            <h2 style="font-family:'Playfair Display',serif; margin:10px 0 6px; font-size: 34px;">Un pensiero per noi</h2>
-            <p style="color:var(--muted); line-height:1.7; margin-top:0">
+            <h2 class="h2">Un pensiero per noi</h2>
+            <p class="p-muted">
               Se desideri farci un regalo, qui trovi l’IBAN. Grazie di cuore ❤️
             </p>
 
@@ -834,311 +429,15 @@ Qui uso iframe "Embed" (più semplice, zero API key). Se vuoi Google Maps JS API
       <footer aria-label="Footer">
         <div class="container">
           <div>
-            <b style="font-family:'Playfair Display',serif; color: rgba(46,42,40,.86)">Donatella &amp; Salvatore</b>
-            <div style="font-size:12.5px">Con amore, vi aspettiamo.</div>
+            <b class="footer-name">Donatella &amp; Salvatore</b>
+            <div class="footer-sub">Con amore, vi aspettiamo.</div>
           </div>
-          <div style="font-size:12.5px">© <span id="year"></span> — Matrimonio</div>
+          <div class="footer-sub">© <span id="year"></span> — Matrimonio</div>
         </div>
       </footer>
     </main>
-
   </div>
 
-  <script>
-    // ----------------------------
-    // CONFIG (Sostituisci qui rapidamente senza cercare nel markup)
-    // ----------------------------
-    const CONFIG = {
-      weddingDate: "DATA (es. 14 Settembre 2026)",
-      rsvpDeadline: "GG/MM (es. 20/08)",
-      churchName: "Nome Chiesa",
-      churchAddress: "CHIESA_ADDRESS",
-      churchTime: "ORE (es. 16:00)",
-      venueName: "Nome Location",
-      venueAddress: "C.so Vittorio Emanuele, 328, 80135 Napoli NA",
-      venueTime: "ORE (es. 19:00)",
-      iban: "IT00 X000 0000 0000 0000 0000 000"
-    };
-
-    // Hydrate placeholders
-    const setText = (id, value) => { const el = document.getElementById(id); if(el) el.textContent = value; };
-    setText("weddingDate", CONFIG.weddingDate);
-    setText("weddingDateMini", CONFIG.weddingDate);
-    setText("rsvpDeadline", CONFIG.rsvpDeadline);
-    setText("churchName", CONFIG.churchName);
-    setText("churchName2", CONFIG.churchName);
-    setText("churchAddress", CONFIG.churchAddress);
-    setText("churchAddress2", CONFIG.churchAddress);
-    setText("venueName", CONFIG.venueName);
-    setText("venueAddress", CONFIG.venueAddress);
-    setText("venueAddress2", CONFIG.venueAddress);
-    setText("churchTime", CONFIG.churchTime);
-    setText("venueTime", CONFIG.venueTime);
-    setText("iban", CONFIG.iban);
-    setText("year", new Date().getFullYear());
-
-    // ----------------------------
-    // Landing “Apri l’invito”
-    // ----------------------------
-    const openSiteBtn = document.getElementById('openSiteBtn');
-    const scrollProgramBtn = document.getElementById('scrollProgramBtn');
-    const heroLetter = document.querySelector('.letter');
-
-    function goToSite(){
-      // piccola animazione prima dello scroll
-      heroLetter.classList.add('fadeout');
-      setTimeout(() => {
-        document.getElementById('programma').scrollIntoView({behavior:'smooth'});
-        setTimeout(() => heroLetter.classList.remove('fadeout'), 900);
-      }, 350);
-    }
-
-    openSiteBtn?.addEventListener('click', goToSite);
-    scrollProgramBtn?.addEventListener('click', () => document.getElementById('programma').scrollIntoView({behavior:'smooth'}));
-
-    // Nav CTA
-    document.getElementById('navRsvpBtn')?.addEventListener('click', () => {
-      document.getElementById('rsvp').scrollIntoView({behavior:'smooth'});
-    });
-
-    // ----------------------------
-    // Mobile menu
-    // ----------------------------
-    const sheet = document.getElementById('sheet');
-    const burger = document.getElementById('burger');
-    const closeSheet = document.getElementById('closeSheet');
-    const sheetLinks = document.querySelectorAll('.sheetLink');
-
-    const openSheet = () => sheet.classList.add('open');
-    const hideSheet = () => sheet.classList.remove('open');
-
-    burger?.addEventListener('click', openSheet);
-    closeSheet?.addEventListener('click', hideSheet);
-    sheet?.addEventListener('click', (e) => { if(e.target === sheet) hideSheet(); });
-    sheetLinks.forEach(a => a.addEventListener('click', () => setTimeout(hideSheet, 120)));
-
-    // ----------------------------
-    // Reveal on scroll (animazioni eleganti)
-    // ----------------------------
-    const reveals = document.querySelectorAll('.reveal');
-    const io = new IntersectionObserver((entries) => {
-      for(const entry of entries){
-        if(entry.isIntersecting){
-          entry.target.classList.add('in');
-          io.unobserve(entry.target);
-        }
-      }
-    }, { threshold: 0.14 });
-    reveals.forEach(el => io.observe(el));
-
-    // ----------------------------
-    // RSVP logic: gestione +1 dinamici
-    // ----------------------------
-    const numPersone = document.getElementById('numPersone');
-    const plusContainer = document.getElementById('plusContainer');
-    const plusList = document.getElementById('plusList');
-    const addPlus = document.getElementById('addPlus');
-    const partecipantiHidden = document.getElementById('partecipanti');
-
-    const plusInputs = []; // {id, input}
-
-    function renderPlus(){
-      plusList.innerHTML = '';
-      plusInputs.forEach((p, idx) => {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'pill';
-        wrapper.innerHTML = `
-          <div style="flex:1">
-            <div style="display:flex; align-items:center; gap:8px">
-              <b>+${idx+1}</b>
-              <small>Nome e Cognome</small>
-            </div>
-            <input aria-label="Nome e cognome +${idx+1}" placeholder="Es. Marco Rossi" style="margin-top:8px" />
-          </div>
-          <button type="button" aria-label="Rimuovi +${idx+1}">Rimuovi</button>
-        `;
-        const input = wrapper.querySelector('input');
-        const btn = wrapper.querySelector('button');
-        input.value = p.value || '';
-        input.addEventListener('input', () => { p.value = input.value; syncPartecipanti(); });
-        btn.addEventListener('click', () => {
-          plusInputs.splice(idx, 1);
-          renderPlus();
-          syncPartecipanti();
-        });
-        plusList.appendChild(wrapper);
-      });
-      syncPartecipanti();
-    }
-
-    function syncPartecipanti(){
-      const me = `${document.getElementById('nome')?.value || ''} ${document.getElementById('cognome')?.value || ''}`.trim();
-      const others = plusInputs.map(p => (p.value || '').trim()).filter(Boolean);
-      const all = [me, ...others].filter(Boolean);
-      partecipantiHidden.value = all.join(' | ');
-    }
-
-    function desiredPlusCount(){
-      const n = parseInt(numPersone.value || '0', 10);
-      if(!Number.isFinite(n) || n <= 1) return 0;
-      return n - 1;
-    }
-
-    function ensurePlusFields(){
-      const need = desiredPlusCount();
-      if(need <= 0){
-        plusInputs.length = 0;
-        plusContainer.style.display = 'none';
-        renderPlus();
-        return;
-      }
-      plusContainer.style.display = 'block';
-      // aggiusta la lunghezza
-      while(plusInputs.length < need) plusInputs.push({ value: '' });
-      while(plusInputs.length > need) plusInputs.pop();
-      renderPlus();
-    }
-
-    numPersone?.addEventListener('change', ensurePlusFields);
-    addPlus?.addEventListener('click', () => {
-      // Permette di aggiungere oltre il numero persone scelto (utile se si sbaglia)
-      plusContainer.style.display = 'block';
-      plusInputs.push({ value: '' });
-      renderPlus();
-      // aggiorna select se necessario
-      const newTotal = plusInputs.length + 1;
-      if(newTotal <= 6) numPersone.value = String(newTotal);
-    });
-
-    // Sync names into hidden field
-    ["nome","cognome"].forEach(id => document.getElementById(id)?.addEventListener('input', syncPartecipanti));
-
-    // ----------------------------
-    // Form submit: validazione e messaggio. (Non invia davvero se action="#")
-    // ----------------------------
-    const form = document.getElementById('rsvpForm');
-    const formMsg = document.getElementById('formMsg');
-
-    function validate(){
-      const requiredIds = ['nome','cognome','contatto','adesione','numPersone'];
-      let ok = true;
-      requiredIds.forEach(id => {
-        const el = document.getElementById(id);
-        if(!el) return;
-        const bad = !String(el.value || '').trim();
-        if(bad){
-          ok = false;
-          el.style.borderColor = 'rgba(229,154,164,.75)';
-        } else {
-          el.style.borderColor = 'rgba(184,146,74,.22)';
-        }
-      });
-      return ok;
-    }
-
-    form?.addEventListener('submit', async (e) => {
-      e.preventDefault();
-      formMsg.textContent = '';
-      syncPartecipanti();
-
-      if(!validate()){
-        formMsg.textContent = 'Controlla i campi obbligatori evidenziati.';
-        return;
-      }
-
-      const action = form.getAttribute('action');
-      if(!action || action === '#'){
-        formMsg.textContent = '✅ Perfetto! (Demo) Collega un endpoint per inviare davvero la RSVP.';
-        form.reset();
-        plusInputs.length = 0;
-        ensurePlusFields();
-        return;
-      }
-
-      try{
-        const data = new FormData(form);
-        const res = await fetch(action, { method: 'POST', body: data, headers: { 'Accept': 'application/json' } });
-        if(res.ok){
-          formMsg.textContent = '✅ RSVP inviata! Grazie!';
-          form.reset();
-          plusInputs.length = 0;
-          ensurePlusFields();
-        } else {
-          formMsg.textContent = '⚠️ Qualcosa non ha funzionato. Riprova o contattaci.';
-        }
-      } catch(err){
-        formMsg.textContent = '⚠️ Errore di rete. Riprova tra poco.';
-      }
-    });
-
-    // ----------------------------
-    // Copy IBAN
-    // ----------------------------
-    const copyBtn = document.getElementById('copyIban');
-    const copyMsg = document.getElementById('copyMsg');
-    copyBtn?.addEventListener('click', async () => {
-      const text = document.getElementById('iban')?.textContent?.trim() || '';
-      try{
-        await navigator.clipboard.writeText(text);
-        copyMsg.textContent = 'Copiato!';
-        setTimeout(() => copyMsg.textContent = '', 1400);
-      } catch{
-        copyMsg.textContent = 'Seleziona e copia manualmente.';
-        setTimeout(() => copyMsg.textContent = '', 1800);
-      }
-    });
-
-    // Init
-    ensurePlusFields();
-  </script>
-
-  <!--
-  ------------------------------------------------------------
-  PROMPT PER GENERARE IMMAGINI/ICONE COERENTI (stile acquerello + oro)
-  ------------------------------------------------------------
-
-  Puoi usare questi prompt con un generatore immagini.
-
-  1) Background hero (acquerello leggero, molto soft)
-     Prompt:
-     "Soft watercolor wedding background, off-white paper texture, pastel sage green leaves, blush pink flowers, tiny gold paint splatters, airy minimal composition with large negative space center, elegant, high resolution, no text, no people, 4k"
-
-  2) Cornici botaniche (top-right e bottom-left)
-     Prompt:
-     "Watercolor botanical corner frame, eucalyptus and olive leaves in sage green, small blush flowers, subtle gold accents, transparent background PNG, minimal, elegant, high resolution"
-
-  3) Divisore ornamentale (linea oro sottile con foglioline)
-     Prompt:
-     "Minimal gold watercolor divider, thin hand-painted gold line with tiny leaf motifs, centered, transparent background PNG, elegant, high resolution"
-
-  4) Icona Chiesa (outline dorato)
-     Prompt:
-     "Minimal line icon of a church, single stroke, gold foil effect, transparent background PNG, modern, elegant, 1024x1024"
-
-  5) Icona Calice / brindisi (outline dorato)
-     Prompt:
-     "Minimal line icon of a champagne glass, gold foil outline, transparent background PNG, modern elegant"
-
-  6) Icona Pin mappa (outline dorato)
-     Prompt:
-     "Minimal line icon map pin, gold foil outline, transparent background PNG, elegant, modern"
-
-  7) Icona Regalo (outline dorato)
-     Prompt:
-     "Minimal line icon gift box with ribbon, gold foil outline, transparent background PNG, modern, elegant"
-
-  8) Texture carta (separata per overlay)
-     Prompt:
-     "White cotton paper texture, subtle watercolor grain, seamless tile, high resolution, neutral, no stains"
-
-  9) Rings illustration (simile all'immagine di riferimento)
-     Prompt:
-     "Watercolor illustration of two intertwined gold wedding rings, soft shading, delicate gold paint splatters, surrounded by sage green leaves and small blush flowers, white paper background, elegant minimal"
-
-  Suggerimenti:
-  - per PNG trasparenti aggiungi: "transparent background" e "PNG".
-  - per background molto pulito aggiungi: "large negative space".
-  - se vuoi un set coerente, usa sempre: "watercolor, pastel sage green, blush pink, gold paint splatters, off-white paper".
-  -->
+  <script src="./app.js"></script>
 </body>
 </html>
