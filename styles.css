@@ -29,6 +29,14 @@ body{
 }
 a{color:inherit}
 
+/* Blocca scroll quando la landing è attiva */
+.no-scroll{
+  overflow: hidden !important;
+  height: 100%;
+  touch-action: none;
+}
+
+
 /* Subtle watercolor texture overlay */
 .texture{
   position:fixed; inset:0;
@@ -144,6 +152,7 @@ a{color:inherit}
 }
 
 .env-front{
+  z-index: 3;
   position:absolute; left:0; right:0; bottom:-1px;
   height: 62%;
   background: linear-gradient(160deg, rgba(255,255,255,.55), rgba(255,255,255,.32));
@@ -152,6 +161,7 @@ a{color:inherit}
 }
 
 .env-flap{
+	z-index: 4;
   position:absolute; left:0; right:0; top:-1px;
   height: 60%;
   transform-origin: top center;
@@ -164,6 +174,7 @@ a{color:inherit}
 
 /* wax seal */
 .wax{
+  z-index: 5;
   position:absolute;
   left:50%; top:54%;
   transform: translate(-50%,-50%);
@@ -225,6 +236,7 @@ a{color:inherit}
   border: 1px solid rgba(184,146,74,.18);
   box-shadow: var(--shadow2);
   transform: translateY(36%) scale(.98);
+  z-index: 6;
   opacity:0;
 }
 .letter-card-inner{
@@ -727,4 +739,68 @@ html{ scroll-behavior:smooth }
   0%,100%{ opacity:.45 }
   50%{ opacity:.85 }
 }
+
+/* =========================
+   MODAL INVITO (popup overlay)
+   ========================= */
+.inviteModal{
+  position: fixed;
+  inset: 0;
+  z-index: 120; /* sopra tutto */
+  display: none;
+  padding: 18px;
+  background: rgba(20,16,12,.42);
+  backdrop-filter: blur(8px);
+}
+
+.inviteModal.open{
+  display: grid;
+  place-items: center;
+}
+
+.invitePanel{
+  width: min(560px, 100%);
+  border-radius: 26px;
+  background: rgba(255,255,255,.82);
+  border: 1px solid rgba(184,146,74,.20);
+  box-shadow: 0 22px 60px rgba(20,16,12,.20);
+  padding: 18px 16px;
+  animation: modalIn .28s ease;
+}
+
+@keyframes modalIn{
+  from{ transform: translateY(10px) scale(.985); opacity:.6; }
+  to{ transform: translateY(0) scale(1); opacity:1; }
+}
+
+.inviteTitle{
+  margin: 8px 0 12px;
+  text-align:center;
+  font-family: "Playfair Display", serif;
+  font-size: clamp(26px, 5vw, 36px);
+}
+
+.inviteCard{
+  background: rgba(255,255,255,.92);
+  border: 1px solid rgba(184,146,74,.18);
+  border-radius: 22px;
+  box-shadow: var(--shadow2);
+  padding: 14px;
+  cursor: pointer;
+  transition: transform .18s ease, box-shadow .18s ease;
+}
+
+.inviteCard:hover{
+  transform: translateY(-2px);
+  box-shadow: 0 26px 55px rgba(20,16,12,.18);
+}
+
+.inviteActions{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  flex-wrap:wrap;
+  margin-top: 14px;
+}
+
 

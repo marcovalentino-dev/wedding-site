@@ -49,6 +49,9 @@ hydrateAll();
 // ----------------------------
 // LANDING ANIMATION -> mostra sito
 // ----------------------------
+// ----------------------------
+// LANDING ANIMATION -> MODAL INVITO -> ENTRA NEL SITO
+// ----------------------------
 const landing = document.getElementById("landing");
 const site = document.getElementById("site");
 const wax = document.getElementById("wax");
@@ -56,65 +59,83 @@ const envelope = document.getElementById("envelope");
 const skipLanding = document.getElementById("skipLanding");
 const landingMsg = document.getElementById("landingMsg");
 
-let opened = false;
+const inviteModal = document.getElementById("inviteModal");
+const inviteCard = document.getElementById("inviteCard");
+const enterSiteBtn = document.getElementById("enterSiteBtn");
+const closeModalBtn = document.getElementById("closeModalBtn");
+
+let invitationOpened = false;
+
+function lockScroll(){
+  document.body.classList.add("no-scroll");
+}
+function unlockScroll(){
+  document.body.classList.remove("no-scroll");
+}
+
+function openModal(){
+  if(!inviteModal) return;
+  inviteModal.classList.add("open");
+  inviteModal.setAttribute("aria-hidden", "false");
+}
+
+function closeModal(){
+  if(!inviteModal) return;
+  inviteModal.classList.remove("open");
+  inviteModal.setAttribute("aria-hidden", "true");
+}
 
 function showSite() {
   if (!landing || !site) return;
+
+  closeModal();
 
   landing.classList.add("fade-out");
   site.classList.add("visible");
   site.setAttribute("aria-hidden", "false");
 
-  // dopo la dissolvenza, rimuovi landing dal DOM per accessibilità
+  // Sblocca scroll una volta entrati nel sito
+  unlockScroll();
+
   setTimeout(() => {
     landing.classList.add("hidden");
   }, 750);
 
-  // start reveals
   initReveals();
 }
-
-let invitationOpened = false;
 
 function openInvitation() {
   if (invitationOpened) return;
   invitationOpened = true;
 
-  landing.classList.add("is-opening");
-  landingMsg.textContent = "💌 L’invito è arrivato";
+  lockScroll(); // blocca subito lo scroll
 
-  // ora NON entriamo nel sito
+  landingMsg && (landingMsg.textContent = "💌 Apro la busta…");
+  landing.classList.add("is-opening");
+
+  // Dopo che la card è uscita (coerente con i tempi CSS) apri il modal
+  // Se hai messo 1.9s + delay 0.35, usiamo ~2.4s totali
+  setTimeout(() => {
+    landingMsg && (landingMsg.textContent = "✨ L’invito è pronto");
+    openModal();
+  }, 2400);
 }
 
-const landingCard = document.getElementById("landingCard");
-
-function enterSite() {
+function enterSite(){
   showSite();
   document.getElementById("home")?.scrollIntoView({ behavior: "smooth" });
 }
 
-landingCard?.addEventListener("click", () => {
-  if (!invitationOpened) return;
-  enterSite();
-});
-
-landingCard?.addEventListener("keydown", (e) => {
-  if ((e.key === "Enter" || e.key === " ") && invitationOpened) {
-    e.preventDefault();
-    enterSite();
-  }
-});
-
-
-
+// Click sigillo
 wax?.addEventListener("click", openInvitation);
+
+// Click busta (comodo mobile)
 envelope?.addEventListener("click", (e) => {
-  // clic sulla busta apre anche (comodo su mobile)
   if (e.target === wax) return;
   openInvitation();
 });
 
-// accessibilità: enter/space sulla busta
+// Accessibilità: enter/space sulla busta
 envelope?.addEventListener("keydown", (e) => {
   if (e.key === "Enter" || e.key === " ") {
     e.preventDefault();
@@ -122,11 +143,39 @@ envelope?.addEventListener("keydown", (e) => {
   }
 });
 
+// Salta animazione: apre direttamente modal (non entra nel sito)
 skipLanding?.addEventListener("click", () => {
-  opened = true;
-  showSite();
-  document.getElementById("home")?.scrollIntoView({ behavior: "smooth" });
+  invitationOpened = true;
+  lockScroll();
+  landing.classList.add("is-opening");
+  landingMsg && (landingMsg.textContent = "✨ L’invito è pronto");
+  openModal();
 });
+
+// Click sul popup: entra nel sito
+inviteCard?.addEventListener("click", enterSite);
+inviteCard?.addEventListener("keydown", (e) => {
+  if (e.key === "Enter" || e.key === " ") {
+    e.preventDefault();
+    enterSite();
+  }
+});
+enterSiteBtn?.addEventListener("click", enterSite);
+
+// Chiudi modal e torna alla busta (resta landing, scroll bloccato)
+closeModalBtn?.addEventListener("click", () => {
+  closeModal();
+  landingMsg && (landingMsg.textContent = "👆 Clicca l’invito per entrare");
+});
+
+// Clic fuori dal pannello chiude il modal (opzionale)
+inviteModal?.addEventListener("click", (e) => {
+  if (e.target === inviteModal) closeModal();
+});
+
+// IMPORTANT: blocca scroll all’avvio perché landing è attiva
+lockScroll();
+
 
 // ----------------------------
 // SITO: Landing “Apri l’invito” dentro hero

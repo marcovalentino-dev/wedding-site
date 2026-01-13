@@ -83,6 +83,37 @@
         </div>
       </div>
     </div>
+	<!-- POPUP INVITO (modal) -->
+	<div class="inviteModal" id="inviteModal" role="dialog" aria-modal="true" aria-label="Invito" aria-hidden="true">
+	  <div class="invitePanel" role="document">
+		<div class="kicker" style="justify-content:center"><span class="dot"></span> Invito</div>
+		<h2 class="inviteTitle">Donatella &amp; Salvatore</h2>
+
+		<div class="inviteCard" id="inviteCard" role="button" tabindex="0" aria-label="Entra nel sito">
+		  <div class="brand-mini">
+			<b>Donatella &amp; Salvatore</b>
+			<span>Ci sposiamo — <span id="weddingDateMini2">DATA</span></span>
+		  </div>
+		  <div class="divider"></div>
+		  <p class="landing-card-text">
+			<b>Data:</b> <span id="weddingDate2">DATA</span><br/>
+			<b>Cerimonia:</b> <span id="churchTime2">ORE</span> — <span id="churchName3">CHIESA</span><br/>
+			<b>Ricevimento:</b> <span id="venueTime2">ORE</span> — <span id="venueName2">RICEVIMENTO</span>
+		  </p>
+		  <p class="hint" style="margin:10px 0 0; text-align:center">Clicca l’invito per entrare</p>
+		</div>
+
+		<div class="inviteActions">
+		  <button class="cta" id="enterSiteBtn" type="button">Entra nel sito</button>
+		  <button class="ghost" id="closeModalBtn" type="button">Torna alla busta</button>
+		</div>
+
+		<p class="hint" style="text-align:center; margin:10px 0 0">
+		  (Finché l’invito è aperto, lo scroll è bloccato.)
+		</p>
+	  </div>
+	</div>
+
   </div>
 
   <!-- =========================
