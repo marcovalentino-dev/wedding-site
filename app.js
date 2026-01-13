@@ -126,20 +126,32 @@ function enterSite(){
   document.getElementById("home")?.scrollIntoView({ behavior: "smooth" });
 }
 
+function handleOpenFromEnvelope() {
+  // Se la busta è già stata aperta almeno una volta,
+  // allora riapro direttamente il popup invito
+  if (invitationOpened) {
+    openModal();
+    landingMsg && (landingMsg.textContent = "👆 Clicca l’invito per entrare");
+    return;
+  }
+  // Altrimenti fai la sequenza completa sigillo -> busta -> popup
+  openInvitation();
+}
+
 // Click sigillo
-wax?.addEventListener("click", openInvitation);
+wax?.addEventListener("click", handleOpenFromEnvelope);
 
 // Click busta (comodo mobile)
 envelope?.addEventListener("click", (e) => {
   if (e.target === wax) return;
-  openInvitation();
+  handleOpenFromEnvelope();
 });
 
 // Accessibilità: enter/space sulla busta
 envelope?.addEventListener("keydown", (e) => {
   if (e.key === "Enter" || e.key === " ") {
     e.preventDefault();
-    openInvitation();
+    handleOpenFromEnvelope();
   }
 });
 
