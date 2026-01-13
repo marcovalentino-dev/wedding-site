@@ -2,12 +2,12 @@
 // CONFIG (Sostituisci qui rapidamente senza cercare nel markup)
 // ----------------------------
 const CONFIG = {
-  weddingDate: "DATA (es. 14 Settembre 2026)",
-  rsvpDeadline: "GG/MM (es. 20/08)",
+  weddingDate: "30 Settembre 2026",
+  rsvpDeadline: "30/09",
   churchName: "Nome Chiesa",
   churchAddress: "CHIESA_ADDRESS",
   churchTime: "ORE (es. 16:00)",
-  venueName: "Nome Location",
+  venueName: "Hotel San Francesco al Monte",
   venueAddress: "C.so Vittorio Emanuele, 328, 80135 Napoli NA",
   venueTime: "ORE (es. 19:00)",
   iban: "IT00 X000 0000 0000 0000 0000 000"
