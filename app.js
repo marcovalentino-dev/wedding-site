@@ -74,25 +74,38 @@ function showSite() {
   initReveals();
 }
 
+let invitationOpened = false;
+
 function openInvitation() {
-  if (opened) return;
-  opened = true;
+  if (invitationOpened) return;
+  invitationOpened = true;
 
-  if (landingMsg) landingMsg.textContent = "✨ Aprendo l’invito…";
   landing.classList.add("is-opening");
+  landingMsg.textContent = "💌 L’invito è arrivato";
 
-  // sequenza: crack + flap + card out, poi entra sito
-  // tempi allineati al CSS
-  setTimeout(() => {
-    if (landingMsg) landingMsg.textContent = "Benvenuti 💛";
-  }, 650);
-
-  setTimeout(() => {
-    showSite();
-    // scroll al top del sito (hero)
-    document.getElementById("home")?.scrollIntoView({ behavior: "smooth" });
-  }, 1650);
+  // ora NON entriamo nel sito
 }
+
+const landingCard = document.getElementById("landingCard");
+
+function enterSite() {
+  showSite();
+  document.getElementById("home")?.scrollIntoView({ behavior: "smooth" });
+}
+
+landingCard?.addEventListener("click", () => {
+  if (!invitationOpened) return;
+  enterSite();
+});
+
+landingCard?.addEventListener("keydown", (e) => {
+  if ((e.key === "Enter" || e.key === " ") && invitationOpened) {
+    e.preventDefault();
+    enterSite();
+  }
+});
+
+
 
 wax?.addEventListener("click", openInvitation);
 envelope?.addEventListener("click", (e) => {

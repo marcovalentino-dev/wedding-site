@@ -159,7 +159,7 @@ a{color:inherit}
   border-bottom: 1px solid rgba(184,146,74,.18);
   clip-path: polygon(0 0, 100% 0, 50% 70%);
   transform: rotateX(0deg);
-  transition: transform .7s cubic-bezier(.2,.9,.2,1);
+  transition: transform 1.1s cubic-bezier(.2,.9,.2,1);
 }
 
 /* wax seal */
@@ -266,9 +266,10 @@ a{color:inherit}
 }
 .landing.is-opening .env-flap{ transform: rotateX(150deg); }
 .landing.is-opening .letter-card{
-  animation: cardOut 1.05s cubic-bezier(.2,.9,.2,1) forwards;
-  animation-delay: .22s;
+  animation: cardOut 1.9s cubic-bezier(.2,.9,.2,1) forwards;
+  animation-delay: .35s;
 }
+
 @keyframes cardOut{
   0%{ opacity:0; transform: translateY(36%) scale(.98); }
   35%{ opacity:1; transform: translateY(10%) scale(1.00); }
@@ -703,3 +704,27 @@ html{ scroll-behavior:smooth }
   color:rgba(46,42,40,.86);
   line-height:1.7;
 }
+
+.letter-card.clickable{
+  cursor:pointer;
+}
+
+.letter-card.clickable:hover{
+  transform: translateY(-14%) scale(1.015);
+  box-shadow: 0 22px 46px rgba(20,16,12,.18);
+}
+
+.enter-hint{
+  text-align:center;
+  font-size:12.5px;
+  color: var(--muted);
+  margin-top: 8px;
+  letter-spacing:.04em;
+  animation: pulseHint 2.2s ease-in-out infinite;
+}
+
+@keyframes pulseHint{
+  0%,100%{ opacity:.45 }
+  50%{ opacity:.85 }
+}
+
